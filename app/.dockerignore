@@ -1,0 +1,30 @@
+# =========================
+# DOCKER IGNORE (Seguridad)
+# =========================
+
+# 1. Control de Versiones (CRÍTICO)
+# Evita que el historial de git (con posibles secretos antiguos) entre a la imagen.
+.git
+.gitignore
+
+# 2. Infraestructura como Código
+# Terraform no debe estar dentro del contenedor de la aplicación.
+../terraform
+../scripts
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# 3. Archivos de Sistema e IDEs
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# 4. Logs y Temporales
+*.log
+tmp/
+
+# 5. Documentación
+README.md
+RUNBOOK.md
