@@ -39,4 +39,4 @@ Este proyecto es desarrollado por **Jose Garagorry**. ¡Hablemos de DevOps, Clou
 📞 **Celular:** +56 956744034  
 
 ---
-*Generated with ❤️ by Geek Monkey Tech DevOps Team*
+*Generated with ❤️ by Jose Garagorry Tech DevOps*

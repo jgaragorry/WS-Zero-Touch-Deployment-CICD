@@ -4,7 +4,7 @@
 ![Security](https://img.shields.io/badge/Focus-DevSecOps-red?style=for-the-badge)
 ![Finance](https://img.shields.io/badge/Focus-FinOps-green?style=for-the-badge)
 
-Este documento detalla el stack tecnológico, las decisiones de arquitectura y las mejores prácticas implementadas bajo el estándar de **Geek Monkey Tech**.
+Este documento detalla el stack tecnológico, las decisiones de arquitectura y las mejores prácticas implementadas bajo el estándar de **Jose Garagorry**.
 
 ## 🛠️ Stack Tecnológico
 
@@ -48,4 +48,4 @@ Este documento detalla el stack tecnológico, las decisiones de arquitectura y l
 * **`.editorconfig`**: Garantiza consistencia en el formato (espacios, saltos de línea) entre diferentes sistemas operativos (Windows/Linux/Mac).
 
 ---
-*Geek Monkey Tech Technical Documentation Standard*
+*Jose Garagorry Technical Documentation Standard*
