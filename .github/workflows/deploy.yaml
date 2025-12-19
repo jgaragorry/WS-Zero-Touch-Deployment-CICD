@@ -1,118 +1,109 @@
 # =============================================================================
-# WORKSHOP #4: ZERO TOUCH DEPLOYMENT PIPELINE
-# Autor: SoftrainCorp Jose Garagorry
-# Descripción: Orquestación completa desde el commit hasta el despliegue en AWS.
+# WORKSHOP #4: ZERO TOUCH DEPLOYMENT (CI/CD)
+# Autor: SoftrainCorp
+# Objetivo: Orquestar todo el ciclo de vida de la aplicación automáticamente.
 # =============================================================================
 
 name: "🚀 Zero Touch Deploy"
 
 # 1. DISPARADORES (TRIGGERS)
-# ¿Cuándo se debe ejecutar este robot?
+# Define CUÁNDO debe despertar el robot.
 on:
   push:
     branches:
-      - main  # Solo cuando se acepta código en la rama principal
+      - main  # Solo se activa cuando hay código nuevo en la rama 'main'
     paths:
-      # Ahorro de dinero: Solo correr si cambian archivos relevantes
+      # FILTRO FINOPS: Solo correr si cambiaron archivos relevantes.
+      # Si cambias solo el README, esto NO gasta minutos de GitHub Actions.
       - 'app/**'
       - 'terraform/**'
       - '.github/workflows/deploy.yaml'
 
-# 2. PERMISOS DE SEGURIDAD (OIDC)
-# Esto es CRITICO. Permite que GitHub solicite un token temporal a AWS
-# sin necesidad de guardar llaves secretas (Access Keys) de larga duración.
+# 2. SEGURIDAD OIDC (Sin Llaves)
+# Permite que GitHub solicite un "pase temporal" a AWS sin guardar credenciales fijas.
 permissions:
-  id-token: write   # Necesario para solicitar el token OIDC
-  contents: read    # Necesario para bajar el código del repo
+  id-token: write   # Necesario para autenticarse con AWS
+  contents: read    # Necesario para leer tu código
 
-# 3. VARIABLES DE ENTORNO GLOBALES
+# 3. VARIABLES GLOBALES
 env:
   AWS_REGION: "us-east-1"
-  TF_VERSION: "1.10.0"  # Fijamos la versión para evitar sorpresas
+  TF_VERSION: "1.10.0"  # ⚠️ CRÍTICO: Debe ser >= 1.10.0 para usar S3 Native Locking
 
-# 4. TRABAJOS (JOBS)
 jobs:
   deploy:
     name: "Build & Deploy Infrastructure"
-    runs-on: ubuntu-latest # Usamos una máquina virtual Linux de GitHub
+    runs-on: ubuntu-latest # Usamos una máquina Linux prestada por GitHub
     defaults:
       run:
-        working-directory: ./terraform # Todos los comandos 'terraform' se ejecutan en esta carpeta
+        working-directory: ./terraform # Por defecto, trabajamos en la carpeta de infraestructura
 
     steps:
-      # --- FASE 1: PREPARACIÓN ---
+      # --- FASE 1: PREPARACIÓN DEL ENTORNO ---
       
       - name: 📥 1. Checkout Code
         uses: actions/checkout@v4
-        # Descarga tu código del repositorio a la máquina virtual.
+        # Descarga tu repositorio en la máquina virtual.
 
       - name: 🔐 2. Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} # El ARN que configuraste en los secretos
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} # Tu rol "GitHubActionsDeployRole"
           aws-region: ${{ env.AWS_REGION }}
-          # Aquí ocurre la magia: GitHub intercambia su identidad por credenciales de AWS temporales.
 
       - name: 🛠️ 3. Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-          # Instala el binario de Terraform en la máquina virtual.
+          # Instala el binario de Terraform para poder ejecutar comandos.
 
-      # --- FASE 2: INFRAESTRUCTURA BASE ---
+      # --- FASE 2: INFRAESTRUCTURA BASE (Terraform) ---
       
       - name: 🏗️ 4. Terraform Init & Apply (Base)
         run: |
-          # Inicializa plugins y backend S3
           terraform init
           
-          # Despliega la infraestructura base (Red, ALB, ECR, ECS).
-          # TRUCO: Como aún no tenemos nuestra imagen Docker construida,
-          # usamos una imagen pública (Nginx) temporalmente para que ECS no falle.
+          # Desplegamos la infraestructura (VPC, ALB, ECR).
+          # TRUCO: Como la imagen ECR aún no existe en la primera ejecución,
+          # usamos Nginx público para que ECS no falle al iniciar.
           terraform apply -auto-approve \
             -var="app_image=public.ecr.aws/nginx/nginx:latest"
 
-      # --- FASE 3: CONSTRUCCIÓN DE SOFTWARE (CI) ---
+      # --- FASE 3: CONSTRUCCIÓN DE SOFTWARE (Docker Build) ---
 
       - name: 🔍 5. Get ECR Repo URL
         id: ecr
         run: |
-          # Le preguntamos a Terraform: "¿Cuál es la URL del repo que acabas de crear?"
-          # Y la guardamos en una variable de entorno del sistema ($GITHUB_ENV)
+          # Extraemos la URL del repo que Terraform acaba de crear
           echo "REPO_URL=$(terraform output -raw ecr_repo_url)" >> $GITHUB_ENV
 
       - name: 🐳 6. Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-        # Autentica el cliente Docker local contra AWS ECR.
+        # Autentica Docker local contra tu AWS ECR privado.
 
       - name: 📦 7. Build, Tag, and Push Docker Image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ env.REPO_URL }}
-          IMAGE_TAG: ${{ github.sha }} # Usamos el Hash del Commit como etiqueta (Trazabilidad)
-        working-directory: ./app # Nos movemos a la carpeta de la App
+          IMAGE_TAG: ${{ github.sha }} # Usamos el Hash del Commit para trazabilidad exacta
+        working-directory: ./app # ¡OJO! Cambiamos a la carpeta de la App
         run: |
           echo "Construyendo imagen: $REPOSITORY:$IMAGE_TAG"
-          
-          # Construye la imagen usando el Dockerfile
           docker build -t $REPOSITORY:$IMAGE_TAG .
-          
-          # Sube la imagen a tu ECR privado en AWS
           docker push $REPOSITORY:$IMAGE_TAG
-          
-          # Guardamos la URL completa de la imagen para el siguiente paso
+          # Guardamos la URI completa para el siguiente paso
           echo "IMAGE_URI=$REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
 
-      # --- FASE 4: DESPLIEGUE FINAL (CD) ---
+      # --- FASE 4: DESPLIEGUE FINAL (Update ECS) ---
 
       - name: 🚀 8. Deploy New Version via Terraform
         run: |
           echo "Actualizando ECS con la imagen: ${{ env.IMAGE_URI }}"
           
-          # Volvemos a correr Terraform, pero esta vez inyectamos
-          # la variable 'app_image' con la imagen que ACABAMOS de construir.
-          # Esto forzará a Fargate a descargar la nueva versión y reiniciar los contenedores.
+          # Volvemos a correr Terraform.
+          # Al cambiar la variable 'app_image', Terraform detecta que la Task Definition cambió
+          # y fuerza a Fargate a rotar los contenedores.
           terraform apply -auto-approve \
             -var="app_image=${{ env.IMAGE_URI }}"
             

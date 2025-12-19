@@ -1,0 +1,55 @@
+# =============================================================================
+# FINOPS: DESTRUCCIÓN CONTROLADA
+# Objetivo: Eliminar todos los recursos para detener la facturación.
+# Ejecución: MANUAL (Botón en GitHub Actions)
+# =============================================================================
+
+name: "🧨 Destroy Infrastructure"
+
+# 1. DISPARADOR MANUAL
+# 'workflow_dispatch' habilita el botón "Run workflow" en la interfaz web.
+on:
+  workflow_dispatch:
+
+# 2. VARIABLES Y PERMISOS
+env:
+  AWS_REGION: "us-east-1"
+  TF_VERSION: "1.10.0"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroy:
+    name: "Terraform Destroy"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: 🧨 Terraform Destroy
+        run: |
+          terraform init
+          
+          # EL COMANDO FINAL
+          # -auto-approve: No pide confirmación (¡Cuidado!).
+          # Pasamos una imagen dummy porque la variable 'app_image' es obligatoria en variables.tf,
+          # aunque al destruir no se use, Terraform valida que exista un valor.
+          terraform destroy -auto-approve \
+        -var="app_image=public.ecr.aws/nginx/nginx:latest"
