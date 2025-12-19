@@ -11,7 +11,7 @@ LABEL maintainer="SoftrainCorp Student"
 LABEL project="Zero-Touch-Deployment"
 
 # 3. Eliminar configuración default de Nginx (Seguridad)
-RUN rm -rf /etc/nginx/conf.d/default.conf
+# RUN rm -rf /etc/nginx/conf.d/default.conf
 
 # 4. Copiar nuestro sitio web al contenedor
 # Nota: Copiamos el contenido de 'src' a la carpeta pública de Nginx
