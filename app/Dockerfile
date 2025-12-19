@@ -15,7 +15,7 @@ RUN rm -rf /etc/nginx/conf.d/default.conf
 
 # 4. Copiar nuestro sitio web al contenedor
 # Nota: Copiamos el contenido de 'src' a la carpeta pública de Nginx
-COPY src/ /usr/share/nginx/html
+COPY src/index.html /usr/share/nginx/html/index.html
 
 # 5. Exponer el puerto 80
 EXPOSE 80
