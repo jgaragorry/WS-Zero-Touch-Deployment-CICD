@@ -1,6 +1,10 @@
 # 🧠 Especificaciones Técnicas y Conceptos
 
-Este documento detalla el stack tecnológico, las decisiones de arquitectura y las mejores prácticas de **DevSecOps** y **FinOps** implementadas.
+![Architecture](https://img.shields.io/badge/Architecture-Cloud_Native-blue?style=for-the-badge)
+![Security](https://img.shields.io/badge/Focus-DevSecOps-red?style=for-the-badge)
+![Finance](https://img.shields.io/badge/Focus-FinOps-green?style=for-the-badge)
+
+Este documento detalla el stack tecnológico, las decisiones de arquitectura y las mejores prácticas implementadas bajo el estándar de **Geek Monkey Tech**.
 
 ## 🛠️ Stack Tecnológico
 
@@ -44,4 +48,4 @@ Este documento detalla el stack tecnológico, las decisiones de arquitectura y l
 * **`.editorconfig`**: Garantiza consistencia en el formato (espacios, saltos de línea) entre diferentes sistemas operativos (Windows/Linux/Mac).
 
 ---
-*SoftrainCorp Technical Documentation Standard*
+*Geek Monkey Tech Technical Documentation Standard*

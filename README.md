@@ -25,12 +25,18 @@ El despliegue crea los siguientes recursos en `us-east-1`:
 4.  **Artifacts:** Amazon ECR con escaneo de vulnerabilidades.
 5.  **State Management:** S3 Bucket + Native Locking (Terraform v1.10+).
 
-## 📞 Contacto & Soporte
-Este proyecto es parte del **Workshop de DevOps Avanzado**.
+## 🌐 Conecta con Geek Monkey Tech 🐵
 
-* **Autor:** Jose Garagorry (SoftrainCorp Student)
-* **Estado:** ✅ Completado
-* **Licencia:** MIT
+Este proyecto es desarrollado por **Jose Garagorry**. ¡Hablemos de DevOps, Cloud y Automatización!
+
+[![Portfolio](https://img.shields.io/badge/🌐_Website-GeekMonkeyTech.com-ff69b4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://geekmonkeytech.com)
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/TU_USUARIO_AQUI)
+[![TikTok](https://img.shields.io/badge/TikTok-Follow_Me-000000?style=for-the-badge&logo=tiktok&logoColor=white)](https://www.tiktok.com/@TU_USUARIO_AQUI)
+[![Instagram](https://img.shields.io/badge/Instagram-Follow_Me-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/TU_USUARIO_AQUI)
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-Comunidad-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://chat.whatsapp.com/TU_LINK_DE_COMUNIDAD)
+
+📞 **Celular:** +56 9 XXXX XXXX (Opcional: Coloca tu número o bórralo si es público)
 
 ---
-*Generated with ❤️ by SoftrainCorp DevOps Team*
+*Generated with ❤️ by Geek Monkey Tech DevOps Team*

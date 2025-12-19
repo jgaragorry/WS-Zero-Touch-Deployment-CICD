@@ -1,6 +1,10 @@
 # 📖 Operational Runbook: Zero Touch Deployment
 
-Este documento detalla los procedimientos estándar de operación (SOP) para iniciar, desplegar y destruir el entorno.
+![Operations](https://img.shields.io/badge/Operations-SOP-orange?style=for-the-badge)
+![Bash](https://img.shields.io/badge/Scripting-Bash-4EAA25?style=for-the-badge&logo=gnu-bash&logoColor=white)
+![AWS CLI](https://img.shields.io/badge/Tools-AWS_CLI-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+
+Este documento detalla los procedimientos estándar de operación (SOP) para iniciar, desplegar y destruir el entorno de manera controlada.
 
 ## ⚙️ Prerrequisitos
 * AWS CLI v2 configurado.
